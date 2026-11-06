@@ -12,16 +12,19 @@
         <div>
           <label for="password">Password: </label>
           <input type="password" id="password" v-model="studentLoginRequest.password"/>
-        </div>        
+        </div>
+        
         <!-- Button group to place buttons side-by-side -->
         <div class="button-group">
           <button type="submit">Login</button>
           <!-- Changed type to "button" to prevent form auto-submission -->
           <button type="button" @click="openCreateModal" class="create-btn">Create</button>
         </div>
-      </form> 
+      </form>
+      
       <p v-if="message" style="color: red;">{{ message }}</p>
     </div>
+
     <!-- NEW: Create Student Info Modal Pop-up -->
     <div v-if="showModal" class="modal-overlay">
       <div class="modal-card">
@@ -43,6 +46,7 @@
             <label for="studentEmail">Email: </label>
             <input type="email" id="studentEmail" v-model="newStudent.email" required />
           </div>
+
           <!-- Modal Action Buttons -->
           <div class="button-group">
             <button type="submit" class="submit-btn">Submit</button>
@@ -51,10 +55,13 @@
         </form>
       </div>
     </div>
+
   </div>
 </template>
+
 <script>
 import LoginService from "../services/LoginService";
+
 export default {
   name: "studentLogin",
   data() {
@@ -64,9 +71,11 @@ export default {
         password: ""
       },
       message: "",
-            // NEW: State for controlling the modal visibility
+      
+      // NEW: State for controlling the modal visibility
       showModal: false,
-            // NEW: Data object object to store registration details
+      
+      // NEW: Data object object to store registration details
       newStudent: {
         studentId: "",
         password: "",
@@ -91,23 +100,36 @@ export default {
           console.error(e);
         });
     },
-        // NEW: Open the registration form modal
+    
+    // NEW: Open the registration form modal
     openCreateModal() {
       this.showModal = true;
-    },    
+    },
+    
     // NEW: Close the registration form modal and clear inputs
     closeCreateModal() {
       this.showModal = false;
       this.newStudent = { studentId: "", password: "", name: "", email: "" };
-    },    
-    // NEW: Handle the registration logic
+    },
+    
+    // updated registration  
     submitRegistration() {
-      // Print the collected student info in console for testing
-      console.log("Submitting new student data:", this.newStudent);      
-      // TODO: Connect to your registration api service here, e.g.:
-      // LoginService.register(this.newStudent).then(...).catch(...)
-            alert("Registration submitted successfully!");
-      this.closeCreateModal(); // Close modal after successful submission
+      console.log("Submitting new student data:", this.newStudent);
+      
+      LoginService.register(this.newStudent)
+        .then(response => {
+          // corresponding to 201 Created response 
+          let successMsg = response.data?.message || "Registration submitted successfully!";
+          alert(successMsg);
+          this.closeCreateModal(); // clear the input 
+        })
+        .catch(e => {
+          // corresponding to 409 or other fail to Create response  
+          console.error(e);
+          // read the error message 
+          let errorMsg = e.response?.data?.message || "Registration failed, please check backend connection.";
+          alert(errorMsg);
+        });
     }
   },
   mounted() {
@@ -115,12 +137,13 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 /* Main wrapper setting the full-screen view and background picture */
 .login-container {
   width: 100vw;
   height: 100vh;
-
+  background-image: url('file:///C:/Users/yangz11/Pictures/Sample Pictures/bg.jpg');
   background-image: url('../assets/Koala.jpg');
   background-size: cover;
   background-position: center;
@@ -130,6 +153,7 @@ export default {
   align-items: center;
   position: relative;
 }
+
 /* Form card layout */
 .edit-form {
   max-width: 320px;
@@ -139,37 +163,44 @@ export default {
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
+
 .edit-form div, .modal-card div {
   margin-bottom: 12px;
   display: flex;
   flex-direction: column; /* Stacks labels above input fields for cleaner look */
 }
+
 .edit-form label, .modal-card label {
   font-size: 0.9rem;
   margin-bottom: 4px;
   font-weight: bold;
 }
+
 .edit-form input, .modal-card input {
   padding: 6px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
 /* Aligns buttons inline with equal distribution spacing */
 .button-group {
   display: flex;
   gap: 10px;
   margin-top: 15px;
 }
+
 .button-group button {
   flex: 1;
   padding: 8px;
   cursor: pointer;
   border-radius: 4px;
 }
+
 .create-btn {
   background-color: #e0e0e0;
   border: 1px solid #ccc;
 }
+
 /* NEW: Full-screen semi-transparent overlay for the modal pop-up */
 .modal-overlay {
   position: absolute;
@@ -183,6 +214,7 @@ export default {
   align-items: center;
   z-index: 100; /* Keeps the modal on top of everything else */
 }
+
 /* NEW: Centered Pop-up Form Card */
 .modal-card {
   max-width: 360px;
@@ -192,11 +224,13 @@ export default {
   border-radius: 8px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
 }
+
 .submit-btn {
   background-color: #4CAF50;
   color: white;
   border: none;
 }
+
 .cancel-btn {
   background-color: #f44336;
   color: white;

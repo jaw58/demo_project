@@ -67,7 +67,7 @@ public class CourseController {
             Course _course = courseRepository.save(new Course(course.getCode(), course.getTitle()));
             return new ResponseEntity<>(_course, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>((Course) null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
