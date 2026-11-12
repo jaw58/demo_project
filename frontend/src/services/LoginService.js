@@ -11,6 +11,13 @@ class LoginService {
   register(studentData) {
     return axios.post(`${API_URL}/register`, studentData);
   }
+
+  // MIDTERM: remove a student account (password is sent in the body, not the URL)
+  remove(studentId, password) {
+    return axios.delete(`${API_URL}/students/${encodeURIComponent(studentId)}`, {
+      data: { password }
+    });
+  }
 }
 
 export default new LoginService();

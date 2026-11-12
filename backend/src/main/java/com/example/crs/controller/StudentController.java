@@ -1,5 +1,5 @@
 package com.example.crs.controller;
-import com.example.crs.model.Student; // import Student 
+import com.example.crs.model.Student; // import Student
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ public class StudentController {
     // Task 1: Simulate "in-memory" Student "Database"
     private static final Map<String, Student> studentDatabase = new ConcurrentHashMap<>();
 
-    // generate a test account 
+    // generate a test account
     static {
         Student defaultStudent = new Student();
         defaultStudent.setStudentId("1001");
@@ -83,5 +83,41 @@ public class StudentController {
         Map<String, String> successResponse = new HashMap<>();
         successResponse.put("message", "Registration successful!");
         return ResponseEntity.status(HttpStatus.CREATED).body(successResponse);
+    }
+
+    // MIDTERM: Remove endpoint, DELETE /api/students/{studentId}
+    // The password is sent in the request body and must match the stored one.
+    @DeleteMapping("/students/{studentId}")
+    public ResponseEntity<?> removeStudent(@PathVariable("studentId") String studentId,
+                                           @RequestBody Map<String, String> removeRequest) {
+        String password = removeRequest.get("password");
+
+        // 1. password must not be empty -> 400
+        if (password == null || password.trim().isEmpty()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Password cannot be empty.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+
+        // 2. student must exist -> 404
+        Student student = studentDatabase.get(studentId);
+        if (student == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Student ID not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+
+        // 3. password must match -> 401
+        if (!student.getPassword().equals(password)) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Invalid Student ID or Password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        }
+
+        // 4. remove from the map -> 200
+        studentDatabase.remove(studentId);
+        Map<String, String> success = new HashMap<>();
+        success.put("message", "Student removed successfully.");
+        return ResponseEntity.ok(success);
     }
 }

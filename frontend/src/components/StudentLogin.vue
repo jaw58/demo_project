@@ -19,6 +19,8 @@
           <button type="submit">Login</button>
           <!-- Changed type to "button" to prevent form auto-submission -->
           <button type="button" @click="openCreateModal" class="create-btn">Create</button>
+          <!-- MIDTERM: Remove button opens the remove-account modal -->
+          <button type="button" @click="openRemoveModal" class="remove-btn">Remove</button>
         </div>
       </form>
       
@@ -56,6 +58,28 @@
       </div>
     </div>
 
+    <!-- MIDTERM: Remove Student Account Modal Pop-up -->
+    <div v-if="showRemoveModal" class="modal-overlay">
+      <div class="modal-card">
+        <h4>Remove Student Account</h4>
+        <form @submit.prevent="submitRemoval">
+          <div>
+            <label for="removeStudentId">Student ID: </label>
+            <input type="text" id="removeStudentId" v-model="removeRequest.studentId" required />
+          </div>
+          <div>
+            <label for="removePassword">Password: </label>
+            <input type="password" id="removePassword" v-model="removeRequest.password" required />
+          </div>
+          <p v-if="removeMessage" style="color: red;">{{ removeMessage }}</p>
+          <div class="button-group">
+            <button type="submit" class="remove-submit-btn">Remove</button>
+            <button type="button" @click="closeRemoveModal" class="cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -74,6 +98,11 @@ export default {
       
       // NEW: State for controlling the modal visibility
       showModal: false,
+
+      // MIDTERM: state for the Remove modal
+      showRemoveModal: false,
+      removeRequest: { studentId: "", password: "" },
+      removeMessage: "",
       
       // NEW: Data object object to store registration details
       newStudent: {
@@ -112,6 +141,30 @@ export default {
       this.newStudent = { studentId: "", password: "", name: "", email: "" };
     },
     
+    // MIDTERM: open / close the Remove modal
+    openRemoveModal() {
+      this.removeMessage = "";
+      this.showRemoveModal = true;
+    },
+    closeRemoveModal() {
+      this.showRemoveModal = false;
+      this.removeRequest = { studentId: "", password: "" };
+      this.removeMessage = "";
+    },
+
+    // MIDTERM: call DELETE /api/students/{studentId}
+    submitRemoval() {
+      LoginService.remove(this.removeRequest.studentId, this.removeRequest.password)
+        .then(response => {
+          alert(response.data?.message || "Student removed.");
+          this.closeRemoveModal();
+        })
+        .catch(e => {
+          console.error(e);
+          this.removeMessage = e.response?.data?.message || "Remove failed, please check backend connection.";
+        });
+    },
+
     // updated registration  
     submitRegistration() {
       console.log("Submitting new student data:", this.newStudent);
@@ -227,6 +280,17 @@ export default {
 
 .submit-btn {
   background-color: #4CAF50;
+  color: white;
+  border: none;
+}
+
+.remove-btn {
+  background-color: #fff3e0;
+  border: 1px solid #ff9800;
+}
+
+.remove-submit-btn {
+  background-color: #d32f2f;
   color: white;
   border: none;
 }
