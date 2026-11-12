@@ -120,7 +120,7 @@ export default {
           var student = response.data;
           console.log(student);
           localStorage.setItem("sid", student.id);
-          alert("success!");
+          this.$router.push('/helloworld');
         })
         .catch(e => {
           this.studentLoginRequest.studentId = "";
@@ -301,3 +301,4 @@ export default {
   border: none;
 }
 </style>
+

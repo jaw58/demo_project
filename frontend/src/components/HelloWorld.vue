@@ -1,44 +1,48 @@
-<script setup>
-defineProps({
-  msg: {
-    type: String,
-    required: true,
-  },
-})
-</script>
-
 <template>
-  <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
-    <h3>
-      You’ve successfully created a project with
-      <a href="https://vite.dev/" target="_blank" rel="noopener">Vite</a> +
-      <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
-    </h3>
+  <div class="hello-container">
+    <h1>Hello World! 🎉</h1>
+    <p>Congratulations, you have logged in successfully!</p>
+
+    <!-- Action buttons container -->
+    <div class="button-container">
+      <button @click="goBack" class="btn">Return to login page</button>
+      <button @click="openCourseApi" class="btn">Open Course API</button>
+    </div>
   </div>
 </template>
 
+<script setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+// Navigate back to login
+const goBack = () => {
+  localStorage.clear();
+  router.push('/');
+};
+
+// Task 2: open the backend Course API in a new tab
+const openCourseApi = () => {
+  window.open('http://localhost:8080/api/courses', '_blank');
+};
+</script>
+
 <style scoped>
-h1 {
-  font-weight: 500;
-  font-size: 2.6rem;
-  position: relative;
-  top: -10px;
-}
-
-h3 {
-  font-size: 1.2rem;
-}
-
-.greetings h1,
-.greetings h3 {
+.hello-container {
+  padding: 40px;
   text-align: center;
 }
 
-@media (min-width: 1024px) {
-  .greetings h1,
-  .greetings h3 {
-    text-align: left;
-  }
+.button-container {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.btn {
+  padding: 8px 16px;
+  cursor: pointer;
 }
 </style>
